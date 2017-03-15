@@ -1,9 +1,6 @@
 package chat;
 
 import javax.swing.*;
-
-import org.eclipse.wb.swing.FocusTraversalOnArray;
-
 import java.awt.*;
 import java.awt.event.*;
 
@@ -99,8 +96,8 @@ public class Chat_Window {
 		setup_serverButton.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		setup_serverButton.setBounds(121, 70, 89, 23);
 		setupframe.getContentPane().add(setup_serverButton);
-		setupframe.getContentPane().setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{setup_serverText, setup_portText, setup_connectButton, setup_serverButton, setup_serverLabel, setup_portLabel}));
 		setupframe.setVisible(true);
+		
 		//Program Frame
 		frame = new JFrame("Chat Program");
 		frame.setSize(800,600);
