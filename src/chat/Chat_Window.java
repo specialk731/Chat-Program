@@ -20,7 +20,7 @@ public class Chat_Window {
 	private JTextArea chatBox;
 	private JTextField setup_serverText;
 	private JTextField setup_portText;
-	private String Address, Port;
+	private String Address, Port, UserName;
 
 	/**
 	 * Create the application.
