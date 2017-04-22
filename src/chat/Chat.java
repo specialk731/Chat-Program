@@ -1,5 +1,9 @@
 package chat;
 
+import java.io.*;
+import java.net.*;
+import java.util.concurrent.*;
+
 public class Chat {
 	
 	static Chat_Window ChatWindow;
@@ -15,5 +19,8 @@ public class Chat {
 		ChatWindow.writetochatBox(s);
 		System.out.println("Server got: " + s);
 	}
-
+	
+	public static void WriteToChatBox(String s){
+		ChatWindow.writetochatBox(s);
+	}
 }
