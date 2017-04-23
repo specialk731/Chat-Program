@@ -51,7 +51,7 @@ public class Chat_Server extends Thread{
 			if (s != st)
 				try {
 					s.writetoClients(message);
-				} catch (IOException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 	}
@@ -94,6 +94,7 @@ class Server_Thread extends Thread {
 			con = new connection(ip,port,uname,hostable);
 			cs.Q.add(con);
 			cs.Q.peek().Display();
+			Chat_Window.AddToList(con.list);
 			
 			oos.writeObject(cs.Q);
 			oos.flush();
@@ -108,8 +109,8 @@ class Server_Thread extends Thread {
 			e.printStackTrace();
 		}
 	}
-	//HERE IS WHERE I AM!!!!!
-	public void writetoClients(String m) throws IOException {
+	
+	public void writetoClients(String m) throws Exception {
 		oos.writeUTF(m);
 		oos.flush();
 	}
@@ -118,7 +119,7 @@ class Server_Thread extends Thread {
 
 class connection  implements Comparable<connection>, Serializable{
 	private static final long serialVersionUID = -7863289088864595768L;
-	String ip, uname, port;
+	String ip, uname, port, list;
 	Boolean hostable = false;
 	
 	public connection (String i, String p, String u, Boolean h) {
@@ -126,6 +127,9 @@ class connection  implements Comparable<connection>, Serializable{
 		port = p;
 		uname = u;
 		hostable = h;
+		list = uname + "-" + ip + ":" + port;
+		if(hostable)
+			list = "*" + list;
 	}
 
 	@Override
@@ -142,6 +146,7 @@ class connection  implements Comparable<connection>, Serializable{
 		System.out.println("Connection: ");
 		System.out.println("IP: " + ip);
 		System.out.println("Port: " + port);
-		System.out.println("UserName: " + uname);			
+		System.out.println("UserName: " + uname);
+		System.out.println(list);
 	}
 }

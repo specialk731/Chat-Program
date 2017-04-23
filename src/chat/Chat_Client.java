@@ -37,9 +37,9 @@ public class Chat_Client extends Thread{
 			
 			Q = (PriorityBlockingQueue<connection>) ois.readObject();
 			
-			Q.peek().Display();
+			//Q.peek().Display();
 			
-			System.out.println("Client " + UName + " listening for messages");
+			//System.out.println("Client " + UName + " listening for messages");
 			message = ois.readUTF();
 			
 			while(message.compareTo("TERMINATE") != 0){

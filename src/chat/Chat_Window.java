@@ -1,6 +1,9 @@
 package chat;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
 import java.awt.event.*;
 
@@ -8,15 +11,16 @@ public class Chat_Window {
 
 	private JFrame frame, setupframe;
 	private JPanel bottomPanel, topPanel;
-	private JTextField textBox, hostField, portField, setup_serverText, setup_portText, setup_usernameText;
+	private JTextField textBox, hostField, portField, setup_serverText, setup_portText, setup_usernameText, txtYes,txtYes_1;
 	private JButton sendButton;
-	private JList list;
-	private JLabel hostLabel, portLabel;
-	private JToggleButton allowHosting;
+	private JLabel hostLabel, portLabel,lblHostable,lblHost;
 	private JTextArea chatBox;
 	private String Address, Port, UserName;
 	private Chat_Server server;
 	private Chat_Client client;
+	private JTable Connection_Table;
+	private static DefaultTableModel model = new DefaultTableModel();
+	private JScrollPane scroll;
 
 	/**
 	 * Create the application.
@@ -31,7 +35,7 @@ public class Chat_Window {
 	private void initialize() {
 		//Setup Frame
 		setupframe = new JFrame("Chat Program Setup");
-		setupframe.setSize(270, 160);
+		setupframe.setSize(270, 185);
 		setupframe.setLocationRelativeTo(null);
 		setupframe.setResizable(false);
 		setupframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -60,6 +64,13 @@ public class Chat_Window {
 		setup_portText.setBounds(110, 39, 144, 20);
 		setupframe.getContentPane().add(setup_portText);
 		
+		JRadioButton AllowHosting = new JRadioButton("Allow Hosting");
+		AllowHosting.setHorizontalAlignment(SwingConstants.CENTER);
+		AllowHosting.setBounds(10, 94, 244, 23);
+		AllowHosting.setSelected(true);
+		setupframe.getContentPane().add(AllowHosting);
+		setupframe.setVisible(true);
+		
 		JButton setup_connectButton = new JButton("Connect");
 		setup_connectButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -69,10 +80,12 @@ public class Chat_Window {
 					Port = setup_portText.getText();
 					portField.setText(Port);
 					UserName = setup_usernameText.getText();
+					if(!AllowHosting.isSelected())
+						txtYes_1.setText("No");						
 					setupframe.setVisible(false);
 					frame.setVisible(true);
 					try{
-					client = new Chat_Client(Address, Port, UserName, true/*allowHosting.isSelected()*/);
+					client = new Chat_Client(Address, Port, UserName, AllowHosting.isSelected());
 					client.start();
 					} catch (Exception e) {
 						setupframe.setVisible(true);
@@ -84,18 +97,19 @@ public class Chat_Window {
 			}
 		});
 		setup_connectButton.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		setup_connectButton.setBounds(10, 98, 113, 23);
+		setup_connectButton.setBounds(10, 124, 113, 23);
 		setupframe.getContentPane().add(setup_connectButton);
 		
 		JButton setup_serverButton = new JButton("New Server");
 		setup_serverButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(setup_serverText.getText().length() > 0 && setup_portText.getText().length() > 0){
+				if(setup_serverText.getText().length() > 0 && setup_portText.getText().length() > 0 && AllowHosting.isSelected()){
 					Address = setup_serverText.getText();
 					hostField.setText(Address);
 					Port = setup_portText.getText();
 					portField.setText(Port);
 					UserName = setup_usernameText.getText();
+					txtYes.setText("Yes");
 					server = new Chat_Server(Address, Port);
 					server.start();
 					System.out.println("Got past creating server");
@@ -103,7 +117,7 @@ public class Chat_Window {
 					frame.setVisible(true);
 					try {
 						Thread.sleep(1000);
-						client = new Chat_Client(Address, Port, UserName, true/*allowHosting.isSelected()*/);
+						client = new Chat_Client(Address, Port, UserName, AllowHosting.isSelected());
 						client.start();
 					} catch (Exception e2) {
 						setupframe.setVisible(true);
@@ -111,12 +125,16 @@ public class Chat_Window {
 						JOptionPane.showMessageDialog(null, "Could not connect to host");
 					}
 					
-				} else
-					JOptionPane.showMessageDialog(null, "Server and Port are Required");
+				} else{
+					if(!AllowHosting.isSelected())
+						JOptionPane.showMessageDialog(null, "In order to host you must Allow Hosting");
+					else
+						JOptionPane.showMessageDialog(null, "Server and Port are Required");
+				}
 			}
 		});
 		setup_serverButton.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		setup_serverButton.setBounds(141, 98, 113, 23);
+		setup_serverButton.setBounds(141, 124, 113, 23);
 		setupframe.getContentPane().add(setup_serverButton);
 		
 		JLabel setup_usernameLabel = new JLabel("Username:");
@@ -128,7 +146,7 @@ public class Chat_Window {
 		setup_usernameText.setColumns(15);
 		setup_usernameText.setBounds(110, 67, 144, 20);
 		setupframe.getContentPane().add(setup_usernameText);
-		setupframe.setVisible(true);
+		
 		
 		//Program Frame
 		frame = new JFrame("Chat Program");
@@ -165,14 +183,36 @@ public class Chat_Window {
 		topPanel.add(portField);
 		portField.setColumns(5);
 		
-		allowHosting = new JToggleButton("Allow Hosting");
-		topPanel.add(allowHosting);
+		lblHost = new JLabel("Host: ");
+		topPanel.add(lblHost);
+		
+		txtYes = new JTextField();
+		txtYes.setText("No");
+		txtYes.setEditable(false);
+		txtYes.setHorizontalAlignment(SwingConstants.CENTER);
+		topPanel.add(txtYes);
+		txtYes.setColumns(10);
+		
+		lblHostable = new JLabel("Hostable:");
+		topPanel.add(lblHostable);
+		
+		txtYes_1 = new JTextField();
+		txtYes_1.setEditable(false);
+		txtYes_1.setText("Yes");
+		txtYes_1.setHorizontalAlignment(SwingConstants.CENTER);
+		topPanel.add(txtYes_1);
+		txtYes_1.setColumns(10);
 		
 		bottomPanel = new JPanel();
 		frame.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
 		bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
 		textBox = new JTextField();
+		textBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				sendButton.doClick();
+			}
+		});
 		bottomPanel.add(textBox);
 		textBox.setColumns(30);
 		
@@ -183,13 +223,28 @@ public class Chat_Window {
 					client.send(textBox.getText());
 					textBox.setText("");
 				}
-				UpdateHost();
+				//UpdateHost();
 			}
 		});
 		bottomPanel.add(sendButton);
 		
-		list = new JList();
-		frame.getContentPane().add(list, BorderLayout.EAST);
+		Connection_Table = new JTable(model);
+		Connection_Table.setEnabled(false);
+		Connection_Table.setRowSelectionAllowed(false);
+		scroll = new JScrollPane(Connection_Table);
+		frame.getContentPane().add(scroll, BorderLayout.EAST);
+
+		model.addColumn("Connections");
+		
+		DefaultTableCellRenderer DTCR = new DefaultTableCellRenderer();
+		DTCR.setHorizontalAlignment(SwingConstants.CENTER);
+		Connection_Table.getColumnModel().getColumn(0).setCellRenderer(DTCR);
+		Connection_Table.getTableHeader().setFont(new Font("Dialog", Font.BOLD, 12));
+		
+		model.addRow(new Object[]{"TEST"});
+		
+		AddToList("TEST2");
+		RemoveFromList(0);
 		
 		frame.setVisible(false);
 	}
@@ -219,6 +274,15 @@ public class Chat_Window {
 		Port = Chat_Client.GetHostPort();
 		hostField.setText(Address);
 		portField.setText(Port);
+	}
+	
+	public static void AddToList(String s){
+		model.addRow(new Object[]{s});
+	}
+	
+	public static void RemoveFromList(int i){
+		model.removeRow(i);
+		
 	}
 
 }
