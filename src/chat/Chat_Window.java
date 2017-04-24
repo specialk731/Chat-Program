@@ -6,21 +6,24 @@ import javax.swing.table.DefaultTableModel;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.concurrent.PriorityBlockingQueue;
 
 public class Chat_Window {
 
 	private JFrame frame, setupframe;
 	private JPanel bottomPanel, topPanel;
-	private JTextField textBox, hostField, portField, setup_serverText, setup_portText, setup_usernameText, txtYes,txtYes_1;
+	private JTextField textBox, hostField, portField, setup_serverText, setup_portText, setup_usernameText;
+	private static JTextField txtYes;
+	private JTextField txtYes_1;
 	private JButton sendButton;
 	private JLabel hostLabel, portLabel,lblHostable,lblHost;
 	private JTextArea chatBox;
 	private String Address, Port, UserName;
-	private Chat_Server server;
-	private Chat_Client client;
-	private JTable Connection_Table;
+	public static Chat_Server server;
+	public static Chat_Client client;
+	private static JTable Connection_Table;
 	private static DefaultTableModel model = new DefaultTableModel();
-	private JScrollPane scroll;
+	private JScrollPane scroll, scroll2;
 
 	/**
 	 * Create the application.
@@ -112,7 +115,7 @@ public class Chat_Window {
 					txtYes.setText("Yes");
 					server = new Chat_Server(Address, Port);
 					server.start();
-					System.out.println("Got past creating server");
+					//System.out.println("Got past creating server");
 					setupframe.setVisible(false);
 					frame.setVisible(true);
 					try {
@@ -155,9 +158,11 @@ public class Chat_Window {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		chatBox = new JTextArea();
+		chatBox.setLineWrap(true);
 		chatBox.setBackground(Color.LIGHT_GRAY);
 		chatBox.setEditable(false);
-		frame.getContentPane().add(chatBox, BorderLayout.CENTER);
+		scroll2 = new JScrollPane(chatBox);
+		frame.getContentPane().add(scroll2, BorderLayout.CENTER);
 		
 		topPanel = new JPanel();
 		frame.getContentPane().add(topPanel, BorderLayout.NORTH);
@@ -241,10 +246,10 @@ public class Chat_Window {
 		Connection_Table.getColumnModel().getColumn(0).setCellRenderer(DTCR);
 		Connection_Table.getTableHeader().setFont(new Font("Dialog", Font.BOLD, 12));
 		
-		model.addRow(new Object[]{"TEST"});
+		//model.addRow(new Object[]{"TEST"});
 		
-		AddToList("TEST2");
-		RemoveFromList(0);
+		//AddToList("TEST2");
+		//RemoveFromList(0);
 		
 		frame.setVisible(false);
 	}
@@ -269,12 +274,12 @@ public class Chat_Window {
 		return UserName;
 	}
 	
-	private void UpdateHost(){
+	/*private void UpdateHost(){
 		Address = Chat_Client.GetHostAddress();
 		Port = Chat_Client.GetHostPort();
 		hostField.setText(Address);
 		portField.setText(Port);
-	}
+	}*/
 	
 	public static void AddToList(String s){
 		model.addRow(new Object[]{s});
@@ -282,7 +287,27 @@ public class Chat_Window {
 	
 	public static void RemoveFromList(int i){
 		model.removeRow(i);
-		
+	}
+	
+	public static void EmptyList(){
+		for(int i = 0; i < Connection_Table.getRowCount(); i++)
+			model.removeRow(i);
 	}
 
+	public static void ResetList(PriorityBlockingQueue<connection> q) {
+		int j = Connection_Table.getRowCount();
+		
+		for(int i = 0; i < j; i++){
+			model.removeRow(0);
+		}
+		
+		for(connection c : q){
+			AddToList(c.list);
+		}
+		
+	}
+	
+	public static void SetHostable(){
+		txtYes.setText("Yes");
+	}
 }
